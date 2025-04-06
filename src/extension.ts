@@ -36,13 +36,48 @@ export function activate(context: vscode.ExtensionContext) {
 	// The command has been defined in the package.json file
 	// Now provide the implementation of the command with registerCommand
 	// The commandId parameter must match the command field in package.json
-	let disposable = vscode.commands.registerCommand('notes-viewer.helloWorld', () => {
+	let cmdEditNotes = vscode.commands.registerCommand('notes-viewer.edit-notes', async () => {
 		// The code you place here will be executed every time your command is executed
 		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from Notes Viewer!');
+		vscode.window.showInformationMessage('Editting...');
+
+		const uri = vscode.Uri.joinPath(context.extensionUri, "assets", "notes.md");
+
+		vscode.window.showTextDocument(uri, { preview: false, viewColumn: getSideEditor()});
+
+		// await vscode.commands.executeCommand("markdown.showPreview", uri);
 	});
 
-	context.subscriptions.push(disposable);
+	let cmdViewNotes = vscode.commands.registerCommand('notes-viewer.view-notes', async () => {
+		// The code you place here will be executed every time your command is executed
+		// Display a message box to the user
+		vscode.window.showInformationMessage('Editting...');
+
+		const uri = vscode.Uri.joinPath(context.extensionUri, "assets", "notes.md");
+
+		vscode.window.showTextDocument(uri, { preview: false, viewColumn: getSideEditor()});
+
+		await vscode.commands.executeCommand("markdown.showPreview", uri);
+	});
+
+	context.subscriptions.push(
+		cmdEditNotes,
+		cmdViewNotes
+	);
+}
+
+function getSideEditor(): vscode.ViewColumn{
+	const editor = vscode.window.activeTextEditor;
+
+	if(!editor)
+		return vscode.ViewColumn.Active;
+
+	const indexOfActive = editor.viewColumn;
+	const totalColumns = vscode.window.visibleTextEditors.length;
+
+	const indexOfWanted = indexOfActive === 1 ? 2 : 1;
+
+	return vscode.ViewColumn.Two;
 }
 
 // This method is called when your extension is deactivated
