@@ -9,15 +9,35 @@
   "categories": [
     "Other"
   ],
-  "activationEvents": [],
+  "activationEvents": [
+    "onCommand:vscodeSidebar.openview",
+    "onView:vscodeSidebar.openview"
+  ],
   "main": "./dist/extension.js",
   "contributes": {
     "commands": [
       {
         "command": "notes-viewer.helloWorld",
         "title": "Hello World"
+      },
+      {
+        "command": "vscodeSidebar.openview",
+        "title": "Sidebar View"
+      },
+      {
+        "command": "vscodeSidebar.menu.view",
+        "title": "Sample WebView in VS Code Sidebar"
       }
-    ]
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "vscodeSidebar.menu.view",
+          "group": "navigation",
+          "when": "view == vscodeSidebar.openview"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
@@ -31,6 +51,7 @@
     "test": "vscode-test"
   },
   "devDependencies": {
+    "@types/markdown-it": "^14.1.2",
     "@types/mocha": "^10.0.6",
     "@types/node": "18.x",
     "@types/vscode": "^1.99.0",
@@ -39,12 +60,15 @@
     "@vscode/test-cli": "^0.0.9",
     "@vscode/test-electron": "^2.3.9",
     "eslint": "^8.57.0",
+    "html-loader": "^5.1.0",
     "ts-loader": "^9.5.1",
     "typescript": "^5.4.5",
-    "webpack": "^5.91.0",
+    "webpack": "^5.98.0",
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
-    "markdown": "^0.5.0"
+    "markdown": "^0.5.0",
+    "markdown-it": "^14.1.0",
+    "marked": "^15.0.7"
   }
 }
