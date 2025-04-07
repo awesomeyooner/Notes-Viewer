@@ -72,6 +72,10 @@
         "title": "Notes Viewer: Add Notes"
       },
       {
+        "command": "notes-viewer.create-new",
+        "title": "Notes Viewer: Create New Notes"
+      },
+      {
         "command": "notes-viewer.remove-notes",
         "title": "Notes Viewer: Remove Notes"
       },

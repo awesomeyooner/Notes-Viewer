@@ -85,6 +85,23 @@ export function activate(context: vscode.ExtensionContext) {
 		await FileManager.writeFile(fileContents, fullUri.fsPath);
 	});
 
+	let cmdCreateNew = vscode.commands.registerCommand('notes-viewer.create-new', async () => {
+
+		vscode.window.showInformationMessage('Create New Notes...');
+
+		const folder = await getDefaultFolder(context);
+
+		const name = await NoteManager.promptUser("Type the Name of Your Notes", "my_notes.md", ".md");
+
+		const fullUri = vscode.Uri.joinPath(folder, name);
+
+		await FileManager.writeFile("", fullUri.fsPath);
+
+		await vscode.window.showTextDocument(fullUri, { preview: false, viewColumn: getSideEditor()});
+
+		await vscode.commands.executeCommand("markdown.showPreview", fullUri);
+	});
+
 	let cmdRemoveNotes = vscode.commands.registerCommand('notes-viewer.remove-notes', async () => {
 
 		vscode.window.showInformationMessage('Entering View Mode...');
@@ -111,6 +128,7 @@ export function activate(context: vscode.ExtensionContext) {
 		cmdEditNotes,
 		cmdViewNotes,
 		cmdAddNotes,
+		cmdCreateNew,
 		cmdRemoveNotes,
 		cmdSetDefaultFolder
 	);
@@ -129,8 +147,9 @@ async function getDefaultFolder(context? : vscode.ExtensionContext) : Promise<vs
 function getSideEditor(): vscode.ViewColumn{
 	const editor = vscode.window.activeTextEditor;
 
-	if(!editor)
+	if(!editor){
 		return vscode.ViewColumn.Active;
+	}
 
 	const indexOfActive = editor.viewColumn;
 	const totalColumns = vscode.window.visibleTextEditors.length;
