@@ -22,6 +22,11 @@ Hello! This is an extension that allows for quick access of `.md` files and also
 - **Remove Notes**
     Removes a `.md` file of your choice from the list of available notes
 
+- **Set Default Folder**
+    Sets the default folder for looking for `.md` files
+
+> **NOTE** This will not look for `.md` files within folders that are inside the default folder!
+
 ## Contact
 
 - **Issues** [Write an issue!](https://github.com/awesomeyooner/Notes-Viewer/issues) 
