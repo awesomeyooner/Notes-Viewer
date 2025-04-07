@@ -3,6 +3,7 @@
 import * as vscode from 'vscode';
 import { ViewProvider } from './util/ViewProvider';
 import { FileManager } from './util/FileManager';
+import { NoteManager } from './util/NoteManager';
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -57,9 +58,35 @@ export function activate(context: vscode.ExtensionContext) {
 
 		const uri = vscode.Uri.joinPath(context.extensionUri, "assets", "notes.md");
 
-		vscode.window.showTextDocument(uri, { preview: false, viewColumn: getSideEditor()});
+		await vscode.window.showTextDocument(uri, { preview: false, viewColumn: getSideEditor()});
 
 		await vscode.commands.executeCommand("markdown.showPreview", uri);
+
+		var folder : string = "";
+
+		const options: vscode.OpenDialogOptions = {
+			canSelectMany: false,
+			canSelectFiles: false,
+			canSelectFolders: true,
+			openLabel: 'Open',
+			filters: {
+			   'All files': ['*']
+		   }
+	   	};
+		
+		await vscode.window.showOpenDialog(options).then(folderUri => {
+			if (folderUri && folderUri[0]) {
+				folder = folderUri[0].fsPath;
+				console.log('Selected folder: ' + folderUri[0].fsPath);
+
+			}
+		});
+
+		let items: vscode.QuickPickItem[] = await NoteManager.getFiles(folder);
+
+		var bob = await vscode.window.showQuickPick(items);
+
+		console.log(bob);
 	});
 
 	let cmdAddNotes = vscode.commands.registerCommand('notes-viewer.add-notes', async () => {
