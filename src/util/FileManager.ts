@@ -22,4 +22,25 @@ export class FileManager{
             console.log("Failed to load file!");
         }
     }
+
+    public static async readFile(path : string) : Promise<string>{
+        try{
+            const data = await fs.promises.readFile(path, 'utf8');
+            
+            return data;
+        }
+        catch(error: any){
+            console.log(error);
+            return "";
+        }
+    }
+
+    public static async writeFile(data : string, path : string){
+        try{
+            await fs.promises.writeFile(path, data);
+        }
+        catch(error: any){
+            console.log(error);
+        }
+    }
 }

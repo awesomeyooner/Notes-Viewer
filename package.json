@@ -42,6 +42,10 @@
         "title": "Notes Viewer: View Notes"
       },
       {
+        "command": "notes-viewer.add-notes",
+        "title": "Notes Viewer: Add Notes"
+      },
+      {
         "command": "vscodeSidebar.openview",
         "title": "Sidebar View"
       },

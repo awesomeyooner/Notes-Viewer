@@ -2,6 +2,8 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import { ViewProvider } from './util/ViewProvider';
+import { FileManager } from './util/FileManager';
+
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
@@ -60,9 +62,48 @@ export function activate(context: vscode.ExtensionContext) {
 		await vscode.commands.executeCommand("markdown.showPreview", uri);
 	});
 
+	let cmdAddNotes = vscode.commands.registerCommand('notes-viewer.add-notes', async () => {
+		// The code you place here will be executed every time your command is executed
+		// Display a message box to the user
+		vscode.window.showInformationMessage('Entering File Prompt...');
+
+		const options: vscode.OpenDialogOptions = {
+			canSelectMany: false,
+			openLabel: 'Open',
+			filters: {
+			   'Markdown files': ['md'],
+			   'All files': ['*']
+		   }
+	   	};
+
+		var inputUri = "";
+
+	   	await vscode.window.showOpenDialog(options).then(fileUri => {
+			if (fileUri && fileUri[0]) {
+				inputUri = fileUri[0].fsPath;
+				console.log('Selected file: ' + fileUri[0].fsPath);
+
+			}
+		});
+
+		const namePrompt = await vscode.window.showInputBox({
+			placeHolder: "Type the Name of Your Notes",
+			value: "my_notes.md"
+		});
+
+		const nameNotes = namePrompt === undefined ? "" : namePrompt;
+
+		const fileContents = await FileManager.readFile(inputUri)
+
+		const assetsUri = vscode.Uri.joinPath(context.extensionUri, "assets", nameNotes);
+
+		await FileManager.writeFile(fileContents, assetsUri.fsPath);
+	});
+
 	context.subscriptions.push(
 		cmdEditNotes,
-		cmdViewNotes
+		cmdViewNotes,
+		cmdAddNotes
 	);
 }
 
