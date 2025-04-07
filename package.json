@@ -27,6 +27,14 @@
           ],
           "default": "",
           "description": "Default Note to Edit and Open"
+        },
+        "notes-viewer.default_folder": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "default": "",
+          "description": "Default Folder to Store Notes"
         }
       }
     },
@@ -66,6 +74,10 @@
       {
         "command": "notes-viewer.remove-notes",
         "title": "Notes Viewer: Remove Notes"
+      },
+      {
+        "command": "notes-viewer.set-default-folder",
+        "title": "Notes Viewer: Set Default Folder"
       },
       {
         "command": "vscodeSidebar.openview",

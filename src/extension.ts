@@ -39,15 +39,15 @@ export function activate(context: vscode.ExtensionContext) {
 	let cmdEditNotes = vscode.commands.registerCommand('notes-viewer.edit-notes', async () => {
 		vscode.window.showInformationMessage('Editting...');
 
-		const assetsFolder = vscode.Uri.joinPath(context.extensionUri, "assets");
+		const folder = await getDefaultFolder(context);
 
 		const defaultNote = await NoteManager.getConfigurationAttribute("default_note");
 
-		const file = await NoteManager.askForFileInFolder(assetsFolder.fsPath, defaultNote);
+		const file = await NoteManager.askForFileInFolder(folder.fsPath, defaultNote);
 
 		await NoteManager.writeConfigurationAttribute("default_note", file);
 
-		const fullFilePath = vscode.Uri.joinPath(assetsFolder, file);
+		const fullFilePath = vscode.Uri.joinPath(folder, file);
 
 		vscode.window.showTextDocument(fullFilePath, { preview: false, viewColumn: getSideEditor()});
 	});
@@ -56,15 +56,15 @@ export function activate(context: vscode.ExtensionContext) {
 		
 		vscode.window.showInformationMessage('Entering View Mode...');
 
-		const assetsFolder = vscode.Uri.joinPath(context.extensionUri, "assets");
+		const folder = await getDefaultFolder(context);
 
 		const defaultNote = await NoteManager.getConfigurationAttribute("default_note");
 
-		const file = await NoteManager.askForFileInFolder(assetsFolder.fsPath, defaultNote);
+		const file = await NoteManager.askForFileInFolder(folder.fsPath, defaultNote);
 
 		await NoteManager.writeConfigurationAttribute("default_note", file);
 		
-		var fullFilePath = vscode.Uri.joinPath(assetsFolder, file);
+		const fullFilePath = vscode.Uri.joinPath(folder, file);
 
 		await vscode.window.showTextDocument(fullFilePath, { preview: false, viewColumn: getSideEditor()});
 
@@ -76,34 +76,54 @@ export function activate(context: vscode.ExtensionContext) {
 		vscode.window.showInformationMessage('Adding Notes...');
 
 		const filePath = await NoteManager.askForFile();
-		const newName = await NoteManager.promptUser("Type the Name of Your Notes", "my_notes.md", ".md");
-
 		const fileContents = await FileManager.readFile(filePath);
 
-		const assetsUri = vscode.Uri.joinPath(context.extensionUri, "assets", newName);
+		const newName = await NoteManager.promptUser("Type the Name of Your Notes", "my_notes.md", ".md");
 
-		await FileManager.writeFile(fileContents, assetsUri.fsPath);
+		const fullUri = vscode.Uri.joinPath(await getDefaultFolder(context), newName);
+
+		await FileManager.writeFile(fileContents, fullUri.fsPath);
 	});
 
 	let cmdRemoveNotes = vscode.commands.registerCommand('notes-viewer.remove-notes', async () => {
 
 		vscode.window.showInformationMessage('Entering View Mode...');
 
-		const assetsFolder = vscode.Uri.joinPath(context.extensionUri, "assets");
+		const folder = await getDefaultFolder(context);
 
-		const file = await NoteManager.askForFileInFolder(assetsFolder.fsPath);
+		const file = await NoteManager.askForFileInFolder(folder.fsPath);
 
-		const fullFilePath = vscode.Uri.joinPath(assetsFolder, file);
+		const fullFilePath = vscode.Uri.joinPath(folder, file);
 
 		await FileManager.deleteFile(fullFilePath.fsPath);
+	});
+
+	let cmdSetDefaultFolder = vscode.commands.registerCommand('notes-viewer.set-default-folder', async () => {
+
+		vscode.window.showInformationMessage('Setting Default Folder...');
+
+		const folder = await NoteManager.askForFolder();
+
+		await NoteManager.writeConfigurationAttribute("default_folder", folder);
 	});
 
 	context.subscriptions.push(
 		cmdEditNotes,
 		cmdViewNotes,
 		cmdAddNotes,
-		cmdRemoveNotes
+		cmdRemoveNotes,
+		cmdSetDefaultFolder
 	);
+}
+
+async function getDefaultFolder(context? : vscode.ExtensionContext) : Promise<vscode.Uri>{
+
+	const folder = await NoteManager.getConfigurationAttribute("default_folder");
+
+	if(folder === "" && context !== undefined)
+		return vscode.Uri.joinPath(context.extensionUri, "assets");
+
+	return vscode.Uri.file(folder);
 }
 
 function getSideEditor(): vscode.ViewColumn{
