@@ -36,81 +36,65 @@ export function activate(context: vscode.ExtensionContext) {
 
 	context.subscriptions.push(openWebView);
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
 	let cmdEditNotes = vscode.commands.registerCommand('notes-viewer.edit-notes', async () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
 		vscode.window.showInformationMessage('Editting...');
 
-		const uri = vscode.Uri.joinPath(context.extensionUri, "assets", "notes.md");
+		const assetsFolder = vscode.Uri.joinPath(context.extensionUri, "assets");
 
-		vscode.window.showTextDocument(uri, { preview: false, viewColumn: getSideEditor()});
+		const file = await NoteManager.askForFileInFolder(assetsFolder.fsPath);
 
-		// await vscode.commands.executeCommand("markdown.showPreview", uri);
+		const fullFilePath = vscode.Uri.joinPath(assetsFolder, file);
+
+		vscode.window.showTextDocument(fullFilePath, { preview: false, viewColumn: getSideEditor()});
 	});
 
 	let cmdViewNotes = vscode.commands.registerCommand('notes-viewer.view-notes', async () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Editting...');
+		
+		vscode.window.showInformationMessage('Entering View Mode...');
 
-		const uri = vscode.Uri.joinPath(context.extensionUri, "assets", "notes.md");
+		const assetsFolder = vscode.Uri.joinPath(context.extensionUri, "assets");
 
-		await vscode.window.showTextDocument(uri, { preview: false, viewColumn: getSideEditor()});
+		var file = await NoteManager.askForFileInFolder(assetsFolder.fsPath);
 
-		await vscode.commands.executeCommand("markdown.showPreview", uri);
+		var fullFilePath = vscode.Uri.joinPath(assetsFolder, file);
 
-		var folder = await NoteManager.askForFolder();
+		await vscode.window.showTextDocument(fullFilePath, { preview: false, viewColumn: getSideEditor()});
 
-		var file = await NoteManager.askForFileInFolder(folder);
-
-		console.log(file);
+		await vscode.commands.executeCommand("markdown.showPreview", fullFilePath);
 	});
 
 	let cmdAddNotes = vscode.commands.registerCommand('notes-viewer.add-notes', async () => {
-		// The code you place here will be executed every time your command is executed
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Entering File Prompt...');
 
-		const options: vscode.OpenDialogOptions = {
-			canSelectMany: false,
-			openLabel: 'Open',
-			filters: {
-			   'Markdown files': ['md'],
-			   'All files': ['*']
-		   }
-	   	};
+		vscode.window.showInformationMessage('Adding Notes...');
 
-		var inputUri = "";
+		const filePath = await NoteManager.askForFile();
+		const newName = await NoteManager.promptUser("Type the Name of Your Notes", "my_notes.md", ".md");
 
-	   	await vscode.window.showOpenDialog(options).then(fileUri => {
-			if (fileUri && fileUri[0]) {
-				inputUri = fileUri[0].fsPath;
-				console.log('Selected file: ' + fileUri[0].fsPath);
+		const fileContents = await FileManager.readFile(filePath);
 
-			}
-		});
-
-		const namePrompt = await vscode.window.showInputBox({
-			placeHolder: "Type the Name of Your Notes",
-			value: "my_notes.md"
-		});
-
-		const nameNotes = namePrompt === undefined ? "" : namePrompt;
-
-		const fileContents = await FileManager.readFile(inputUri)
-
-		const assetsUri = vscode.Uri.joinPath(context.extensionUri, "assets", nameNotes);
+		const assetsUri = vscode.Uri.joinPath(context.extensionUri, "assets", newName);
 
 		await FileManager.writeFile(fileContents, assetsUri.fsPath);
+	});
+
+	let cmdRemoveNotes = vscode.commands.registerCommand('notes-viewer.remove-notes', async () => {
+
+		vscode.window.showInformationMessage('Entering View Mode...');
+
+		const assetsFolder = vscode.Uri.joinPath(context.extensionUri, "assets");
+
+		const file = await NoteManager.askForFileInFolder(assetsFolder.fsPath);
+
+		const fullFilePath = vscode.Uri.joinPath(assetsFolder, file);
+
+		await FileManager.deleteFile(fullFilePath.fsPath);
 	});
 
 	context.subscriptions.push(
 		cmdEditNotes,
 		cmdViewNotes,
-		cmdAddNotes
+		cmdAddNotes,
+		cmdRemoveNotes
 	);
 }
 

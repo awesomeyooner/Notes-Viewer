@@ -43,4 +43,13 @@ export class FileManager{
             console.log(error);
         }
     }
+
+    public static async deleteFile(path : string){
+        try{
+            await fs.promises.rm(path);
+        }
+        catch(error){
+            console.log(error);
+        }
+    }
 }

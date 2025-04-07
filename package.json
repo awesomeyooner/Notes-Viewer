@@ -46,6 +46,10 @@
         "title": "Notes Viewer: Add Notes"
       },
       {
+        "command": "notes-viewer.remove-notes",
+        "title": "Notes Viewer: Remove Notes"
+      },
+      {
         "command": "vscodeSidebar.openview",
         "title": "Sidebar View"
       },
