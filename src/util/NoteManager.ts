@@ -45,4 +45,14 @@ export class NoteManager{
 
         return folder;
     }
+
+    public static async askForFileInFolder(folder : string) : Promise<string>{
+        let items: vscode.QuickPickItem[] = await NoteManager.getFiles(folder);
+        
+        var outputFile = await vscode.window.showQuickPick(items);
+
+        var file : string = outputFile === undefined ? "" : outputFile.label;
+
+        return file;
+    }
 }

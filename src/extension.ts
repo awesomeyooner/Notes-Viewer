@@ -62,31 +62,11 @@ export function activate(context: vscode.ExtensionContext) {
 
 		await vscode.commands.executeCommand("markdown.showPreview", uri);
 
-		var folder : string = "";
+		var folder = await NoteManager.askForFolder();
 
-		const options: vscode.OpenDialogOptions = {
-			canSelectMany: false,
-			canSelectFiles: false,
-			canSelectFolders: true,
-			openLabel: 'Open',
-			filters: {
-			   'All files': ['*']
-		   }
-	   	};
-		
-		await vscode.window.showOpenDialog(options).then(folderUri => {
-			if (folderUri && folderUri[0]) {
-				folder = folderUri[0].fsPath;
-				console.log('Selected folder: ' + folderUri[0].fsPath);
+		var file = await NoteManager.askForFileInFolder(folder);
 
-			}
-		});
-
-		let items: vscode.QuickPickItem[] = await NoteManager.getFiles(folder);
-
-		var bob = await vscode.window.showQuickPick(items);
-
-		console.log(bob);
+		console.log(file);
 	});
 
 	let cmdAddNotes = vscode.commands.registerCommand('notes-viewer.add-notes', async () => {
