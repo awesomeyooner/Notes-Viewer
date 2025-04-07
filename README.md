@@ -1,5 +1,7 @@
 # notes-viewer README
 
+Boom!
+
 This is the README for your extension "notes-viewer". After writing up a brief description, we recommend including the following sections.
 
 ## Features
