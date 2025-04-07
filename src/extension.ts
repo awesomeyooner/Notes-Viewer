@@ -41,7 +41,11 @@ export function activate(context: vscode.ExtensionContext) {
 
 		const assetsFolder = vscode.Uri.joinPath(context.extensionUri, "assets");
 
-		const file = await NoteManager.askForFileInFolder(assetsFolder.fsPath);
+		const defaultNote = await NoteManager.getConfigurationAttribute("default_note");
+
+		const file = await NoteManager.askForFileInFolder(assetsFolder.fsPath, defaultNote);
+
+		await NoteManager.writeConfigurationAttribute("default_note", file);
 
 		const fullFilePath = vscode.Uri.joinPath(assetsFolder, file);
 
@@ -54,8 +58,12 @@ export function activate(context: vscode.ExtensionContext) {
 
 		const assetsFolder = vscode.Uri.joinPath(context.extensionUri, "assets");
 
-		var file = await NoteManager.askForFileInFolder(assetsFolder.fsPath);
+		const defaultNote = await NoteManager.getConfigurationAttribute("default_note");
 
+		const file = await NoteManager.askForFileInFolder(assetsFolder.fsPath, defaultNote);
+
+		await NoteManager.writeConfigurationAttribute("default_note", file);
+		
 		var fullFilePath = vscode.Uri.joinPath(assetsFolder, file);
 
 		await vscode.window.showTextDocument(fullFilePath, { preview: false, viewColumn: getSideEditor()});

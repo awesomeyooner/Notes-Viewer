@@ -12,6 +12,19 @@
   "activationEvents": [],
   "main": "./dist/extension.js",
   "contributes": {
+    "configuration": {
+      "title": "Notes Viewer",
+      "properties": {
+        "notes-viewer.default_note": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "default": "",
+          "description": "Default Note to Edit and Open"
+        }
+      }
+    },
     "viewsContainers": {
       "activitybar": [
         {

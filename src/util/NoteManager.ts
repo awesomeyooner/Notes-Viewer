@@ -1,3 +1,4 @@
+import { errorMonitor } from 'events';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as vscode from "vscode"
@@ -5,6 +6,26 @@ import * as vscode from "vscode"
 export class NoteManager{
  
     constructor(){}   
+
+    public static async getConfigurationAttribute(attribute : string, extension : string = "notes-viewer") : Promise<any>{
+        const config : vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration(extension);
+
+        let configValue = await config.get(attribute);
+
+        if(configValue === undefined)
+            throw new Error("Could not read configuration!");
+
+        return configValue;
+    }
+
+    public static async writeConfigurationAttribute(attribute : string, value : string, extension : string = "notes-viewer"){
+        const config : vscode.WorkspaceConfiguration = vscode.workspace.getConfiguration(extension);
+
+        if(value === null || value === undefined || value === "")
+            throw new Error("Value is Empty!");
+
+        await config.update(attribute, value, vscode.ConfigurationTarget.Global);
+    }
 
     public static async getFiles(folderPath : string) : Promise<vscode.QuickPickItem[]>{
         var files : vscode.QuickPickItem[] = [];
@@ -108,8 +129,13 @@ export class NoteManager{
         return file;
     }
 
-    public static async askForFileInFolder(folder : string) : Promise<string>{
+    public static async askForFileInFolder(folder : string, defaultFile : string = "") : Promise<string>{
         let items: vscode.QuickPickItem[] = await NoteManager.getFiles(folder);
+
+        var defaultItem : vscode.QuickPickItem = {label: defaultFile, description: "Default File"};
+
+        if(defaultItem.label !== "")
+            items.unshift(defaultItem);
         
         //ask for the file and set it equal to this variable
         var outputFile = await vscode.window.showQuickPick(items);
