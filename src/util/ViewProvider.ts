@@ -50,7 +50,7 @@ export class ViewProvider implements vscode.WebviewViewProvider {
 
         const uriMarkdown = webview.asWebviewUri(vscode.Uri.joinPath(this.extensionUri, "assets", "notes.md"));
 
-        const markdownContents = "";//marked.parse(this.fileManager.getFile());
+        const markdownContents = marked.parse(this.fileManager.getFile());
 
         return `<!DOCTYPE html>
                 <html lang="en">
@@ -61,6 +61,12 @@ export class ViewProvider implements vscode.WebviewViewProvider {
 
                     <body>
                         <img src="${uriCheatSheet}">
+
+                        <p>
+                        [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT) </br></br>
+                        [![ubuntu22](https://img.shields.io/badge/-UBUNTU_22.04-orange?style=flat-square&logo=ubuntu&logoColor=white)](https://releases.ubuntu.com/jammy/) </br></br>
+                        [![humble](https://img.shields.io/badge/-HUMBLE-blue?style=flat-square&logo=ros)](https://docs.ros.org/en/humble/index.html) 
+                        </p>
                     </body>
 
                     <div id="content">
