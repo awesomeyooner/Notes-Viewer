@@ -13,15 +13,22 @@ export function activate(context: vscode.ExtensionContext) {
 	// This line of code will only be executed once when your extension is activated
 	console.log('Congratulations, your extension "notes-viewer" is now active!');
 
-	const provider = new ViewProvider(context.extensionUri);
 
-	context.subscriptions.push(
-		vscode.window.registerWebviewViewProvider(
-			ViewProvider.viewType,
-		  provider
-		)
-	  );
+	// ===== View Provider =====
 
+		// Create the view provider
+		const provider = new ViewProvider(context.extensionUri);
+
+		// Register the view provider
+		context.subscriptions.push(
+			vscode.window.registerWebviewViewProvider(
+				ViewProvider.viewType,
+			provider
+			)
+		);
+
+	// ===== Create Commands =====
+	
 	context.subscriptions.push(
 	vscode.commands.registerCommand("vscodeSidebar.menu.view", () => {
 		const message = "Menu/Title of extension is clicked !";
@@ -59,6 +66,8 @@ export function activate(context: vscode.ExtensionContext) {
 	});
 
 	let cmdViewNotes = vscode.commands.registerCommand('notes-viewer.view-notes', async () => {
+
+		console.log("View Notes Command Entered");
 		
 		vscode.window.showInformationMessage('Entering View Mode...');
 
@@ -67,11 +76,14 @@ export function activate(context: vscode.ExtensionContext) {
 
 			const defaultNote = await NoteManager.getConfigurationAttribute("default_note");
 
-			const file = await NoteManager.askForFileInFolder(folder.fsPath, defaultNote);
+			const file = await NoteManager.askForElementInFolder(folder.fsPath, defaultNote);
+			// const file = await NoteManager.askForFileInFolder(folder.fsPath, defaultNote);
 
 			await NoteManager.writeConfigurationAttribute("default_note", file);
 			
 			const fullFilePath = vscode.Uri.joinPath(folder, file);
+
+			console.log(fullFilePath.fsPath);
 
 			await vscode.window.showTextDocument(fullFilePath, { preview: false, viewColumn: getSideEditor()});
 
@@ -165,28 +177,54 @@ export function activate(context: vscode.ExtensionContext) {
 	);
 }
 
+
+/**
+ * Gets the default folder from the settings. If it's not set, it returns
+ * the extension's actual default folder (assets)
+ * @param context `vscode.ExtensionContext?` The extension context
+ * @returns `Promise<vscode.Uri>` The path to the default folder
+ */
 async function getDefaultFolder(context? : vscode.ExtensionContext) : Promise<vscode.Uri>{
 
+	// Get the default config value
 	const folder = await NoteManager.getConfigurationAttribute("default_folder");
 
+	// If there is no default folder and the context is valid,
+	// return the default path as the actual extension's default folder (assets)
 	if(folder === "" && context !== undefined)
 		return vscode.Uri.joinPath(context.extensionUri, "assets");
 
+	// If default folder is present, then return the folder
 	return vscode.Uri.file(folder);
 }
 
+
+/**
+ * Gets the side editor window 
+ * @returns The side editor window
+ */
 function getSideEditor(): vscode.ViewColumn{
+
+	// The current window open
 	const editor = vscode.window.activeTextEditor;
 
+	// If there is no active editor, then return a new
+	// editor that will be the new active editor
 	if(!editor){
 		return vscode.ViewColumn.Active;
 	}
 
+	// The index of the active editor
 	const indexOfActive = editor.viewColumn;
+
+	// The total number of editors open
 	const totalColumns = vscode.window.visibleTextEditors.length;
 
+	// If the active index is 1, then return an editor with index 2
+	// Otherwise, return editor with index 1
 	const indexOfWanted = indexOfActive === 1 ? 2 : 1;
 
+	// Just skipe verything and return the second editor window
 	return vscode.ViewColumn.Two;
 }
 

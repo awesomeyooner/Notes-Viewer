@@ -4,6 +4,7 @@ import * as fs from 'fs';
 import { FileManager } from "./FileManager";
 
 export class ViewProvider implements vscode.WebviewViewProvider {
+
     public static readonly viewType = "vscodeSidebar.openview";
 
     private view?: vscode.WebviewView;
@@ -34,7 +35,7 @@ export class ViewProvider implements vscode.WebviewViewProvider {
 
         webviewView.onDidChangeVisibility(ev => {
             webviewView.webview.html = this.getHTML(webviewView.webview);
-            console.log("Hello!");
+            console.log("Sidebar Visibility Toggled");
         });
 
         const message = "Loaded View!";
